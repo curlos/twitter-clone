@@ -99,7 +99,7 @@ const LeftSidebar = () => {
       
       <UserContainer>
         <UserInfo>
-          <UserIcon src={`/assets/1.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
+          <UserIcon src={`/assets/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
           <UserNameContainer>
             <UserFullName>Curlos</UserFullName>
             <Username>@curlos</Username>

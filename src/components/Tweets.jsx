@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import Tweet from './Tweet'
 
 const MainContainer = styled.div`
   background-color: #1C1E20;
@@ -9,7 +10,7 @@ const MainContainer = styled.div`
 const Tweets = () => {
   return (
     <MainContainer>
-      hello world
+      <Tweet />
     </MainContainer>
   );
 }
