@@ -11,6 +11,7 @@ const UserIcon = styled.img`
   width: 50px;
   height: 50px;
   border-radius: 50%;
+  cursor: pointer;
 `
 
 const TweetInfo = styled.div`
@@ -28,7 +29,11 @@ const TweetTopInfo = styled.div`
 const AuthorFullName = styled.span`
   color: #fff;
   font-weight: bold;
+  cursor: pointer;
 
+  &:hover {
+    text-decoration: underline;
+  }
 `
 
 const Verified = styled.span`
@@ -50,6 +55,7 @@ const TweetActions = styled.div`
 const TweetAction = styled.span`
   i {
     margin-right: 10px;
+    cursor: pointer;
   }
 `
 

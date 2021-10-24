@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import SmallUser from './SmallUser'
 
 const MainContainer = styled.div`
   display: flex;
@@ -10,6 +11,7 @@ const MainContainer = styled.div`
   margin: 10px auto;
   margin-right: 20px;
   height: 95vh;
+  
 `
 
 const IconContainer = styled.div`
@@ -97,24 +99,15 @@ const LeftSidebar = () => {
 
         <TweetButton>Tweet</TweetButton>
       </div>
+
+      <SmallUser />
       
-      <UserContainer>
-        <UserInfo>
-          <UserIcon src={`/assets/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
-          <UserNameContainer>
-            <UserFullName>Curlos</UserFullName>
-            <Username>@curlos</Username>
-          </UserNameContainer>
-        </UserInfo>
-
-        <div>
-          <i class="fas fa-ellipsis-h"></i>
-        </div>
-      </UserContainer>
-
-
       
+
+
+    
     </MainContainer>
+    
   );
 }
 

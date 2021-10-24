@@ -16,8 +16,8 @@ const Topbar = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 20px;
-  padding: 15px;
-  border-bottom: 1px solid #54595a;;
+  padding: 18px;
+  border-bottom: 1px solid #54595a;
 `
 
 const FeedType = styled.div`
