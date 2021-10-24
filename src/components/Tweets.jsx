@@ -11,6 +11,12 @@ const Tweets = () => {
   return (
     <MainContainer>
       <Tweet />
+      <Tweet />
+      <Tweet />
+      <Tweet />
+      <Tweet />
+      <Tweet />
+      <Tweet />
     </MainContainer>
   );
 }
