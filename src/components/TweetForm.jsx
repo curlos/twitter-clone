@@ -65,7 +65,7 @@ const TweetButton = styled.button`
   font-weight: bold;
   border: none;
   border-radius: 30px;
-  padding: 15px;
+  padding: 12px;
   width: 100%;
   cursor: pointer;
 `
