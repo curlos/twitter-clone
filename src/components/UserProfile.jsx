@@ -1,3 +1,6 @@
+import axios from 'axios'
+import { useState, useEffect, useContext } from 'react'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Tweets from './Tweets'
 
@@ -15,7 +18,7 @@ const Topbar = styled.div`
   align-items: center;
   font-size: 20px;
   padding: 18px;
-  border-bottom: 1px solid #54595a;
+  border-bottom: 1px solid #caeef5;
 `
 
 const UserTopInfo = styled.div`
@@ -163,6 +166,27 @@ const Option = styled.div`
 
 const UserProfile = () => {
 
+  const { id } = useParams()
+  const [profileUser, setProfileUser] = useState({})
+
+  useEffect(() => {
+    const fetchFromAPI = async () => {
+      const userResponse = await axios.get(`http://localhost:8888/api/users/user/${id}`)
+      console.log(userResponse.data)
+      setProfileUser(userResponse.data)
+    }
+
+    fetchFromAPI()
+  }, [])
+
+  const getAllRetweets = () => {
+
+  }
+
+  const getAllLikes = () => {
+
+  }
+
   return (
     <MainContainer>
       <Topbar>
@@ -176,11 +200,11 @@ const UserProfile = () => {
         </UserTopInfo>
       </Topbar>
 
-      <CoverPicture src="/assets/lakers_banners.jpg"/>
+      <CoverPicture src="/images/default_cover.jpg"/>
 
       <AboutContainer>
         <TopInfo>
-          <UserIcon src="/assets/lakers_icon.jpeg"/>
+          <UserIcon src="/images/default_icon.jpeg"/>
 
           <div>
             <i class="fas fa-ellipsis-h"></i>
@@ -219,7 +243,7 @@ const UserProfile = () => {
         </FollowContainer>
 
         <FollowedBy>
-          <VerySmallUserIcon src="/assets/nba_logo.jpeg"/> 
+          <VerySmallUserIcon src="/images/nba_logo.jpeg"/> 
           <div>Followed by NBA, LeBron James, and 5 more</div>
         </FollowedBy>
 

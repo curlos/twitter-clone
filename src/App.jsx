@@ -5,41 +5,59 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import './App.css';
+import styled from 'styled-components'
+import { useContext } from 'react'
+import { AuthContext } from './context/auth/AuthContext'
+
 import LeftSidebar from './components/LeftSidebar'
 import RightSidebar from './components/RightSidebar'
 import Feed from './components/Feed'
 import UserProfile from "./components/UserProfile";
-import styled from 'styled-components'
-import './App.css';
+import Authentication from './components/Authentication'
+import { AuthContextProvider } from './context/auth/AuthContext'
+import { TweetsContextProvider } from './context/tweets/TweetsContext'
 
 const MainContainer = styled.div`
   display: flex;
-  font-family: Roboto;
   margin: 0 45px;
 `
 
 const App = () => {
+
   return (
-    <Router>
-      <MainContainer>
-        <LeftSidebar />
+    <AuthContextProvider>
+      <TweetsContextProvider>
+        <Router>
+          <Switch>
+            <Route path="/" exact>
+              <MainContainer>
+                <LeftSidebar />
+                <Feed />
+                <RightSidebar />
+              </MainContainer>
+            </Route>
 
-        <Switch>
-          <Route path="/" exact>
-            <Feed />
-            <RightSidebar />
-          </Route>
+            <Route path="/register" exact>
+              <Authentication type="register"/>
+            </Route>
 
-          <Route path="/user/:id" exact>
-            <UserProfile />
-            <RightSidebar />
-          </Route>
+            <Route path="/login" exact>
+              <Authentication type="login"/>
+            </Route>
 
-        </Switch>
-
-      </MainContainer>
-        
-    </Router>
+            <Route path="/user/:id" exact>
+              <MainContainer>
+                <LeftSidebar />
+                <UserProfile />
+                <RightSidebar />
+              </MainContainer>
+            </Route>
+          </Switch>
+            
+        </Router>
+      </TweetsContextProvider>
+    </AuthContextProvider>
 
     
   );
