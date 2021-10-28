@@ -1,5 +1,8 @@
+import { useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import Tweet from './Tweet'
+import axios from 'axios'
+import { TweetsContext } from '../context/tweets/TweetsContext'
 
 const MainContainer = styled.div`
   background-color: #1C1E20;
@@ -8,16 +11,59 @@ const MainContainer = styled.div`
 
 
 const Tweets = () => {
+
+  const { tweets, tweetsDispatch } = useContext(TweetsContext)
+  const [sortType, setSortType] = useState('newest')
+  const [loading, setLoading] = useState(true)
+
+
+  useEffect(() => {
+    const fetchFromAPI = async () => {
+      const response = await axios.get('http://localhost:8888/api/tweets/')
+      console.log(response.data)
+      const filteredTweets = getSortedTweets(response.data)
+      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets })
+      setLoading(false)
+    }
+
+    fetchFromAPI()
+  }, [])
+
+  const getSortedTweets = (tweetsToFilter) => {
+    switch(sortType) {
+      case 'newest':
+        return sortTweetsByNewest(tweetsToFilter)
+      case 'oldest':
+        return sortTweetsByOldest(tweetsToFilter)
+      case 'replies':
+        return sortByMostReplies(tweetsToFilter)
+      default:
+        return tweetsToFilter
+    }
+  }
+
+  console.log(tweets)
+
+  const sortTweetsByNewest = (tweetsToFilter) => {
+    return tweetsToFilter.sort((tweetOne, tweetTwo) => (tweetOne.createdAt > tweetTwo.createdAt ? -1 : 1))
+  }
+
+  const sortTweetsByOldest = (tweetsToFilter) => {
+    return tweetsToFilter.sort((tweetOne, tweetTwo) => (tweetOne.createdAt > tweetTwo.createdAt ? 1 : -1))
+  }
+
+  const sortByMostReplies = (tweetsToFilter) => {
+    return tweetsToFilter.sort((tweetOne, tweetTwo) => (tweetOne.replies.length > tweetTwo.replies.length ? -1 : 1))
+  }
+
+  console.log(tweets)
+
   return (
-    <MainContainer>
-      <Tweet />
-      <Tweet />
-      <Tweet />
-      <Tweet />
-      <Tweet />
-      <Tweet />
-      <Tweet />
-    </MainContainer>
+    loading ? ('Loading...') : (
+      <MainContainer>
+        {tweets.map((tweet) => <Tweet tweetObj={tweet}/>)}
+      </MainContainer>
+    )
   );
 }
 
