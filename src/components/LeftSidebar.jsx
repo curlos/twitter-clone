@@ -1,5 +1,9 @@
+import { useContext } from 'react'
+import { Link } from 'react-router-dom'
+
 import styled from 'styled-components'
 import SmallUser from './SmallUser'
+import { AuthContext } from '../context/auth/AuthContext'
 
 const MainContainer = styled.div`
   display: flex;
@@ -45,62 +49,47 @@ const TweetButton = styled.button`
   width: 100%;
 `
 
-const UserContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-`
-
-const UserIcon = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-`
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const UserNameContainer = styled.div`
-  margin-left: 10px;
-`
-
-const UserFullName = styled.div`
-  font-weight: bold;
-`
-
-const Username = styled.div`
-  color: lightgray;
+const StyledLink = styled(Link)`
+  color: #fff;
+  text-decoration: none;
 `
 
 const LeftSidebar = () => {
+
+  const { user } = useContext(AuthContext)
+
+  console.log(user)
+
+
   return (
     <MainContainer>
       <div>
-        <IconContainer>
-          <Icon color={'#47EEFF'} fontSize={'27'}>
-            <i class="fab fa-twitter"></i>
-          </Icon>
-        </IconContainer>
+        <Link to="/">
+          <IconContainer>
+            <Icon color={'#47EEFF'} fontSize={'27'}>
+              <i class="fab fa-twitter"></i>
+            </Icon>
+          </IconContainer>
+        </Link>
 
         {pages.map((page) => {
           return (
-            <IconContainer>
-              <Icon>
-                {page.icon}
-              </Icon>
+            <StyledLink to={page.linkURL}>
+              <IconContainer>
+                <Icon>
+                  {page.icon}
+                </Icon>
 
-              <IconDesc>{page.name}</IconDesc>
-            </IconContainer>
+                <IconDesc>{page.name}</IconDesc>
+              </IconContainer>
+            </StyledLink>
           )
         })}
 
         <TweetButton>Tweet</TweetButton>
       </div>
 
-      <SmallUser />
+      <SmallUser user={user}/>
       
       
 
@@ -115,34 +104,42 @@ const pages = [
   {
     name: 'Home',
     icon: <i class="fab fa-twitter"></i>,
+    linkURL: '/'
   },
   {
     name: 'Explore',
     icon: <i class="fas fa-hashtag"></i>,
+    linkURL: '/'
   },
   {
     name: 'Notifications',
     icon: <i class="far fa-bell"></i>,
+    linkURL: '/'
   },
   {
     name: 'Messages',
     icon: <i class="far fa-envelope"></i>,
+    linkURL: '/'
   },
   {
     name: 'Bookmarks',
     icon: <i class="far fa-bookmark"></i>,
+    linkURL: '/'
   },
   {
     name: 'Lists',
     icon: <i class="fas fa-list-ul"></i>,
+    linkURL: '/'
   },
   {
     name: 'Profile',
     icon: <i class="far fa-user"></i>,
+    linkURL: '/'
   },
   {
     name: 'More',
     icon: <i class="fas fa-ellipsis-h"></i>,
+    linkURL: '/'
   },
 ]
 

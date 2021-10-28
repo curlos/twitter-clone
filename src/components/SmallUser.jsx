@@ -39,16 +39,15 @@ const FollowButton = styled.button`
   padding: 10px 20px;
 `
 
-const SmallUser = ({ buttonType }) => {
-
+const SmallUser = ({ buttonType, user }) => {
 
   return (
     <UserContainer>
       <UserInfo>
-        <UserIcon src={`/assets/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
+        <UserIcon src={`/images/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
         <UserNameContainer>
-          <UserFullName>Curlos</UserFullName>
-          <Username>@curlos</Username>
+          <UserFullName>{!user ? 'Curlos' : user.fullName}</UserFullName>
+          <Username>{!user ? '@curlos' : user.email}</Username>
         </UserNameContainer>
       </UserInfo>
 

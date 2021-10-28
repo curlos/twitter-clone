@@ -1,5 +1,7 @@
+import { useContext } from 'react' 
 import styled from 'styled-components'
 import SmallUser from './SmallUser'
+import { AuthContext } from '../context/auth/AuthContext'
 
 const MainContainer = styled.div`
   flex: 3;
@@ -31,13 +33,16 @@ const ShowMoreButton = styled.button`
 `
 
 const RecommendedUsers = () => {
+
+  const { user } = useContext(AuthContext)
+
   return (
     <MainContainer>
       
 
       <Header>Who to follow</Header>
-      <SmallUser buttonType="follow"/>
-      <SmallUser buttonType="follow"/>
+      <SmallUser buttonType="follow" user={user}/>
+      <SmallUser buttonType="follow" user={user}/>
 
       <ShowMoreButton>Show more</ShowMoreButton>
     </MainContainer>
