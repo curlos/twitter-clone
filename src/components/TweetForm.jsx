@@ -1,6 +1,10 @@
+import { useState, useEffect, useContext } from 'react'
+import axios from 'axios'
 import styled from 'styled-components'
+import { AuthContext } from '../context/auth/AuthContext'
+import { TweetsContext } from '../context/tweets/TweetsContext'
 
-const MainContainer = styled.div`
+const FormTweet = styled.form`
   display: flex;
   width: 100%;
   background-color: #232627;
@@ -72,12 +76,43 @@ const TweetButton = styled.button`
 
 
 const TweetForm = () => {
+  
+  const { user, userDispatch } = useContext(AuthContext)
+  const { tweets, tweetsDispatch } = useContext(TweetsContext)
+
+  const [text, setText] = useState('')
+
+  const handlePostTweet = async (e) => {
+    e.preventDefault()
+
+    if (!user) {
+      return
+    }
+
+    try {
+      const body = {
+        userID: user._id,
+        text: text
+      }
+
+      console.log(body)
+      
+      const response = await axios.post('http://localhost:8888/api/tweets/tweet', body)
+      tweetsDispatch({ type: "UPDATE_TWEETS", payload: [...tweets, response.data]})
+
+      console.log(response.data)
+    } catch(err) {
+
+    }
+  }
+
+
   return (
-    <MainContainer>
-      <UserIcon src="/assets/user_icon.jpg"/>
+    <FormTweet onSubmit={handlePostTweet}>
+      <UserIcon src="/images/user_icon.jpg"/>
 
       <FormCreate>
-        <Textarea placeholder="What's happening?"/>
+        <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="What's happening?"/>
 
         <FormActions>
 
@@ -89,12 +124,12 @@ const TweetForm = () => {
           </MediaOptions>
 
           <div>
-            <TweetButton>Tweet</TweetButton>
+            <TweetButton onClick={handlePostTweet}>Tweet</TweetButton>
           </div>
         </FormActions>
       </FormCreate>
       
-    </MainContainer>
+    </FormTweet>
   );
 }
 
