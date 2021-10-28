@@ -1,4 +1,9 @@
+import { useState, useEffect, useContext } from 'react'
+import { useHistory, Link } from 'react-router-dom'
+import { AuthContext } from '../context/auth/AuthContext'
+import axios from 'axios'
 import styled from 'styled-components'
+import * as timeago from 'timeago.js';
 
 const MainContainer = styled.div`
   display: flex;
@@ -59,48 +64,136 @@ const TweetAction = styled.span`
   }
 `
 
+const Retweeted = styled.span`
+  color: #5af15a;
+`
 
-const Tweet = () => {
+const Liked = styled.span`
+  color: red;
+`
+
+
+const Tweet = ({ tweetObj }) => {
+
+  const { user, userDispatch } = useContext(AuthContext)
+
+  const [tweetInfo, setTweetInfo] = useState({ tweet: tweetObj, author: {} })
+  const { tweet, author } = tweetInfo
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFromAPI = async () => {
+      const authorResponse = await axios.get(`http://localhost:8888/api/users/user/${tweet.userID}`)
+      setTweetInfo({...tweetInfo, author: authorResponse.data})
+      setLoading(false)
+    }
+
+    fetchFromAPI()
+  }, [])
+
+  const toggleLike = async () => {
+    console.log(user)
+    if (!user) {
+      return
+    }
+
+    try {
+      console.log('liking tweet')
+      const body = {
+        userID: user._id
+      }
+      console.log(tweet._id)
+      console.log(user._id)
+
+      console.log(user)
+      const response = await axios.put(`http://localhost:8888/api/tweets/tweet/like/${tweet._id}`, body)
+      console.log(response.data)
+      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      console.log('updatedUser')
+      console.log(user)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const toggleRetweet = async () => {
+    console.log(user)
+    if (!user) {
+      return
+    }
+
+    try {
+      console.log('retweeting')
+      const body = {
+        userID: user._id
+      }
+
+      const response = await axios.put(`http://localhost:8888/api/tweets/tweet/retweet/${tweet._id}`, body)
+      console.log(response.data)
+      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      console.log('updatedUser')
+      console.log(user)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
-    <MainContainer>
-      <UserIcon src="/assets/user_icon.jpg"/>
+    loading ? 'Loading...' : (
+      <MainContainer>
+        <UserIcon src="/images/user_icon.jpg"/>
 
-      <TweetInfo>
-        <TweetTopInfo>
-          <AuthorFullName>Donald J. Trump</AuthorFullName>
-          <Verified><i class="fas fa-check-circle"></i></Verified>
-          <span>@realDonaldTrump</span>
-          <span>-</span>
-          <span>May 8</span>
-        </TweetTopInfo>
+        <TweetInfo>
+          <TweetTopInfo>
+            <Link to={`/user/${author._id}`}>
+              <AuthorFullName>{author.fullName}</AuthorFullName>
+            </Link>
+            <Verified><i class="fas fa-check-circle"></i></Verified>
+            <span>{author.email}</span>
+            <span>-</span>
+            <span>{timeago.format(tweet.createdAt)}</span>
+          </TweetTopInfo>
+  
+          <TweetContent>
+            {tweet.text}
+          </TweetContent>
+            
+          <TweetActions>
+            <TweetAction>
+              <i class="far fa-comment"></i>
+              <span>{tweet.replies.length}</span>
+            </TweetAction>
 
-        <TweetContent>
-          Sorry losers and haters, but my I.Q. is the highest - and you all know it! Please don't feel so stupid or insecure, it's not your fault.
-        </TweetContent>
-          
-        <TweetActions>
-          <TweetAction>
-            <i class="far fa-comment"></i>
-            <span>40.7K</span>
-          </TweetAction>
-
-          <TweetAction>
-            <i class="fas fa-retweet"></i>
-            <span>2.1M</span>
-          </TweetAction>
-
-          <TweetAction>
-            <i class="far fa-heart"></i>
-            <span>1.8M</span>
-          </TweetAction>
-
-          <TweetAction>
-            <i class="fas fa-share-square"></i>
-          </TweetAction>
-          
-        </TweetActions>
-      </TweetInfo>
-    </MainContainer>
+            <TweetAction>
+              {user && user.retweets.includes(tweet._id) ? (
+                <Retweeted>
+                  <i class="fas fa-retweet" onClick={toggleRetweet}></i>
+                </Retweeted>
+              ): <i class="fas fa-retweet" onClick={toggleRetweet}></i>}
+              
+              <span>{tweet.retweets.length}</span>
+            </TweetAction>
+  
+            <TweetAction>
+              {user && user.likes.includes(tweet._id) ? (
+                <Liked>
+                  <i class="fas fa-heart" onClick={toggleLike}></i>
+                </Liked>
+              ): <i class="far fa-heart" onClick={toggleLike}></i>}
+              
+              <span>{tweet.likes.length}</span>
+            </TweetAction>
+  
+            <TweetAction>
+              <i class="fas fa-share-square"></i>
+            </TweetAction>
+            
+          </TweetActions>
+        </TweetInfo>
+      </MainContainer>
+    )
   );
 }
 
