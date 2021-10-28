@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import TweetForm from './TweetForm'
 import Tweets from './Tweets'
+import axios from 'axios'
 
 const MainContainer = styled.div`
   flex: 6;
@@ -30,6 +31,7 @@ const FeedIcon = styled.div`
 
 
 const Feed = () => {
+
   return (
     <MainContainer>
       <Topbar>
@@ -37,6 +39,7 @@ const Feed = () => {
         <FeedIcon><i class="fab fa-galactic-senate"></i></FeedIcon>
       </Topbar>
       <TweetForm />
+
       <Tweets />
     </MainContainer>
   );
