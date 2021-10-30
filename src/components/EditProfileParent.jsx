@@ -1,27 +1,33 @@
 import axios from 'axios'
-import { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
-import { AuthContext } from '../context/auth/AuthContext'
-import styled from 'styled-components'
-import Tweets from './Tweets'
-import moment from 'moment'
+import { useState, useContext } from 'react'
 import EditProfileModal from './EditProfileModal'
 import EditProfileForm from './EditProfileForm'
+import { AuthContext } from '../context/auth/AuthContext'
 
-const EditProfileParent = ({ showModal, setShowModal, profileUserInfo }) => {
+const EditProfileParent = ({ showModal, setShowModal, profileUserInfo, setProfileUserInfo }) => {
+
+  const { user, userDispatch } = useContext(AuthContext)
 
   const [profileInfo, setProfileInfo] = useState({
-    name: profileUserInfo.user.fullName || '',
+    fullName: profileUserInfo.user.fullName || '',
     bio: profileUserInfo.user.bio || '',
     location: profileUserInfo.user.location || '',
     website: profileUserInfo.user.website || '',
-    birthDate: new Date() || '',
+    birthDate: profileUserInfo.user.birthDate ? new Date(profileUserInfo.user.birthDate) : new Date()
   })
 
 
 
   const handleSubmit = async () => {
-    console.log(profileInfo)
+    const profileInfoModified = {...profileInfo, birthDate: profileInfo.birthDate.toJSON()}
+    console.log(profileInfoModified)
+    console.log(profileUserInfo.user._id)
+
+    const response = await axios.put(`http://localhost:8888/api/users/user/${profileUserInfo.user._id}`, profileInfo)
+
+    setProfileUserInfo({...profileInfo, user: response.data})
+    userDispatch({ type: "UPDATE_USER", payload: response.data})
+    setShowModal(false)
   }
 
 

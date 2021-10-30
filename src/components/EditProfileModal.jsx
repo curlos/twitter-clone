@@ -9,7 +9,6 @@ const Modal = styled.div`
   top: 0;
   width: 100%; /* Full width */
   height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 `
@@ -20,7 +19,11 @@ const ModalContent = styled.div`
   background-color: #232627;
   border-radius: 15px;
   border: 1px solid #888;
-  overflow: auto; /* Enable scroll if needed */
+`
+
+const ModalInnerContent = styled.div`
+  max-height: 70vh;
+  overflow-y: scroll;
 `
 
 const CloseBar = styled.div`
@@ -82,9 +85,10 @@ const EditProfileModal = ({ showModal, setShowModal, handleSubmit, children }) =
 
         </CloseBar>
 
-        {children}
-
-        <Footer>&nbsp;</Footer>
+        <ModalInnerContent>
+          {children}
+          <Footer>&nbsp;</Footer>
+        </ModalInnerContent>
         
         
       </ModalContent>

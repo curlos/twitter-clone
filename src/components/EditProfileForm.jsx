@@ -101,13 +101,9 @@ const Popper = styled.div`
 
 
 const EditProfileForm = ({ profileInfo, setProfileInfo }) => {
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-  }
   
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form>
       <CoverPicture src="/images/default_cover.jpg"/>
 
       <AboutContainer>
@@ -119,7 +115,7 @@ const EditProfileForm = ({ profileInfo, setProfileInfo }) => {
       <FormInputContainers>
         <FormInputContainer>
           <StyledLabel>Name</StyledLabel>
-          <FormInput value={profileInfo.name} onChange={(e) => setProfileInfo({...profileInfo, name: e.target.value})} placeholder="Name" />
+          <FormInput value={profileInfo.fullName} onChange={(e) => setProfileInfo({...profileInfo, fullName: e.target.value})} placeholder="Name" />
         </FormInputContainer>
 
         <FormInputContainer>
