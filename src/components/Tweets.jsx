@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
-import Tweet from './Tweet'
+import Tweet from './SmallTweet'
 import axios from 'axios'
 import { TweetsContext } from '../context/tweets/TweetsContext'
 

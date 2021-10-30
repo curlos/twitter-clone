@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { AuthContext } from '../context/auth/AuthContext'
 import styled from 'styled-components'
 import Tweets from './Tweets'
@@ -80,6 +80,10 @@ const FollowButton = styled.button`
   margin-left: 15px;
   border: 1px solid #54595a;
   cursor: pointer;
+`
+
+const UnfollowButton = styled(FollowButton)`
+  background-color: #434649;
 `
 
 const EditButton = styled(FollowButton)`
@@ -174,10 +178,15 @@ const Option = styled.div`
   cursor: pointer;
 `
 
+const StyledLink = styled(Link)`
+  color: #fff;
+  text-decoration: none;
+`
+
 
 const UserProfile = () => {
 
-  const { user } = useContext(AuthContext)
+  const { user, userDispatch } = useContext(AuthContext)
   const { id } = useParams()
   const [profileUserInfo, setProfileUserInfo] = useState({user: {}, tweets: [],likes: [], retweets: [], media: []})
   const [selectedTweetsType, setSelectedTweetsType] = useState('Tweets')
@@ -186,6 +195,7 @@ const UserProfile = () => {
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
+    window.scrollTo(0, 0)
     const fetchFromAPI = async () => {
       const userResponse = await axios.get(`http://localhost:8888/api/users/user/${id}`)
       console.log(userResponse.data)
@@ -240,6 +250,28 @@ const UserProfile = () => {
 
     return tweets
   }
+
+  const handleFollowUser = async () => {
+    console.log(profileUserInfo.user._id)
+    console.log(user._id)
+    if (user === null) {
+      return
+    }
+
+    if (!user._id || (user._id && user._id === profileUserInfo.user._id)) {
+      return
+    }
+
+    const body = {
+      childUserID: user._id
+    }
+
+    const response = await axios.put(`http://localhost:8888/api/users/user/follow/${profileUserInfo.user._id}`, body)
+    console.log(response.data)
+
+    setProfileUserInfo({...profileUserInfo, user: response.data.updatedParentUser})
+    userDispatch({ type: "UPDATE_USER", payload: response.data.updatedChildUser})
+  }
   
   console.log(profileUserInfo)
 
@@ -248,7 +280,9 @@ const UserProfile = () => {
     loading ? <div>Loading...</div> : (
       <MainContainer>
         <Topbar>
-          <i class="fas fa-arrow-left"></i>
+          <StyledLink to="/">
+            <i class="fas fa-arrow-left"></i>
+          </StyledLink>
           <UserTopInfo>
             <div>
             <UserFullName>{profileUserInfo.user.fullName}</UserFullName>
@@ -267,7 +301,10 @@ const UserProfile = () => {
             <div>
               <i class="fas fa-ellipsis-h"></i>
               {user && profileUserInfo.user._id !== user._id ? (
-                <FollowButton>Follow</FollowButton>
+                profileUserInfo.user.followers.includes(user._id) ? (
+                  <UnfollowButton onClick={handleFollowUser}>Unfollow</UnfollowButton>
+                ) : <FollowButton onClick={handleFollowUser}>Follow</FollowButton>
+                
               ) : <EditButton onClick={() => setShowModal(true)}>Edit</EditButton>}
             </div>
           </TopInfo>
@@ -278,7 +315,7 @@ const UserProfile = () => {
           </UserFullNameSmall>
 
           <UserUsername>{profileUserInfo.user.email}</UserUsername>
-          <UserBio>Welcome the #Lakeshow | 17x Champions</UserBio>
+          <UserBio>{profileUserInfo.user.bio || 'Welcome the #Lakeshow | 17x Champions'}</UserBio>
           
           <div>
             <UserLocation>
@@ -288,7 +325,7 @@ const UserProfile = () => {
 
             <WebsiteLink>
               <i class="fas fa-link"></i>
-              <span>{profileUserInfo.user.websiteLink || 'Unknown.com'}</span>
+              <span>{profileUserInfo.user.website || 'Unknown.com'}</span>
             </WebsiteLink>
 
             <JoinDate>
@@ -298,8 +335,8 @@ const UserProfile = () => {
           </div>
 
           <FollowContainer>
-            <FollowingNum><strong>79</strong> following</FollowingNum>
-            <span><strong>10.1M</strong> Followers</span>
+            <FollowingNum><strong>{profileUserInfo.user.following.length}</strong> following</FollowingNum>
+            <span><strong>{profileUserInfo.user.followers.length}</strong> {profileUserInfo.user.followers.length === 1 ? 'Follower' : 'Followers'}</span>
           </FollowContainer>
 
           <FollowedBy>
@@ -317,7 +354,7 @@ const UserProfile = () => {
 
         <Tweets tweetsToShow={tweetsToShow}/>
 
-        <EditProfileParent showModal={showModal} setShowModal={setShowModal} profileUserInfo={profileUserInfo} />
+        <EditProfileParent showModal={showModal} setShowModal={setShowModal} profileUserInfo={profileUserInfo} setProfileUserInfo={setProfileUserInfo}/>
 
       </MainContainer>
     )
