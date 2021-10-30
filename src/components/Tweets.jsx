@@ -10,7 +10,7 @@ const MainContainer = styled.div`
 `
 
 
-const Tweets = () => {
+const Tweets = ({ tweetsToShow }) => {
 
   const { tweets, tweetsDispatch } = useContext(TweetsContext)
   const [sortType, setSortType] = useState('newest')
@@ -18,6 +18,13 @@ const Tweets = () => {
 
 
   useEffect(() => {
+    if (tweetsToShow) {
+      const filteredTweets = getSortedTweets(tweetsToShow)
+      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets })
+      setLoading(false)
+      return
+    }
+
     const fetchFromAPI = async () => {
       const response = await axios.get('http://localhost:8888/api/tweets/')
       console.log(response.data)
@@ -27,7 +34,7 @@ const Tweets = () => {
     }
 
     fetchFromAPI()
-  }, [])
+  }, [tweetsToShow])
 
   const getSortedTweets = (tweetsToFilter) => {
     switch(sortType) {
@@ -59,7 +66,7 @@ const Tweets = () => {
   console.log(tweets)
 
   return (
-    loading ? ('Loading...') : (
+    loading ? <div>Loading...</div> : (
       <MainContainer>
         {tweets.map((tweet) => <Tweet tweetObj={tweet}/>)}
       </MainContainer>

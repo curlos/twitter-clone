@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 const UserContainer = styled.div`
@@ -44,7 +45,9 @@ const SmallUser = ({ buttonType, user }) => {
   return (
     <UserContainer>
       <UserInfo>
-        <UserIcon src={`/images/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
+        <Link to={`/user/${user._id}`}>
+          <UserIcon src={`/images/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
+        </Link>
         <UserNameContainer>
           <UserFullName>{!user ? 'Curlos' : user.fullName}</UserFullName>
           <Username>{!user ? '@curlos' : user.email}</Username>
