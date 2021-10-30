@@ -25,6 +25,10 @@ const UserNameContainer = styled.div`
 
 const UserFullName = styled.div`
   font-weight: bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `
 
 const Username = styled.div`
@@ -40,18 +44,30 @@ const FollowButton = styled.button`
   padding: 10px 20px;
 `
 
+const UnfollowButton = styled(FollowButton)`
+  background-color: #434649;
+`
+
+const StyledLink = styled(Link)`
+  color: #fff;
+  text-decoration: none;
+  
+`
+
 const SmallUser = ({ buttonType, user }) => {
 
   return (
     <UserContainer>
       <UserInfo>
-        <Link to={`/user/${user._id}`}>
+        <StyledLink to={`/user/${user._id}`}>
           <UserIcon src={`/images/user_icon.jpg` || `https://media.idownloadblog.com/wp-content/uploads/2017/03/Twitter-new-2017-avatar-001.png`}/>
-        </Link>
-        <UserNameContainer>
-          <UserFullName>{!user ? 'Curlos' : user.fullName}</UserFullName>
-          <Username>{!user ? '@curlos' : user.email}</Username>
-        </UserNameContainer>
+        </StyledLink>
+        <StyledLink to={`/user/${user._id}`}>
+          <UserNameContainer>
+            <UserFullName>{!user ? 'Curlos' : user.fullName}</UserFullName>
+            <Username>{!user ? '@curlos' : user.email}</Username>
+          </UserNameContainer>
+        </StyledLink>
       </UserInfo>
 
       <div>

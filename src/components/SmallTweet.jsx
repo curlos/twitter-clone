@@ -11,7 +11,6 @@ const MainContainer = styled.div`
   background-color: #232627;
   border-bottom: 1px solid #54595a;
   padding: 15px;
-  width: 100%;
 
   i {
     cursor: pointer;
@@ -56,8 +55,11 @@ const Verified = styled.span`
 `
 
 const TweetContent = styled.div`
+  word-break: break-word;
+  overflow-wrap: anywhere;
   margin-top: 5px;
   margin-bottom: 15px;
+  white-space: pre;
 `
 
 const TweetActions = styled.div`
@@ -83,6 +85,7 @@ const Liked = styled.span`
 `
 
 const StyledLink = styled(Link)`
+  color: #fff;
   text-decoration: none;
 `
 
@@ -122,38 +125,60 @@ const DeleteButton = styled.span`
   }
 `
 
+const DetailedTweetInfo = styled.div`
 
-const Tweet = ({ tweetObj }) => {
+`
+
+const TimePosted = styled.div`
+  padding: 10px 0px;
+  border-bottom: 1px solid lightgray;
+`
+
+const DetailedTweetActionsInfo = styled.span`
+  padding: 10px 0px;
+`
+
+const DetailedTweetActionNum  = styled.span`
+  margin-right: 10px;
+`
+
+
+const SmallTweet = ({ tweetObj, fromTweetPage }) => {
 
   const { user, userDispatch } = useContext(AuthContext)
   const { tweets, tweetsDispatch } = useContext(TweetsContext)
 
-  const [tweetInfo, setTweetInfo] = useState({ tweet: tweetObj, author: {} })
+  const [tweetInfo, setTweetInfo] = useState({ tweet: {}, author: {} })
   const { tweet, author } = tweetInfo
   const [loading, setLoading] = useState(true)
   const [showDropdown, setShowDropdown] = useState(false)
 
   useEffect(() => {
+    
     if (tweet === null) {
       return null
     }
 
     const fetchFromAPI = async () => {
-      const authorResponse = await axios.get(`http://localhost:8888/api/users/user/${tweet.userID}`)
+      // getting an error here because the userID from the tweet is empty
+      const authorResponse = await axios.get(`http://localhost:8888/api/users/user/${tweetObj.userID}`)
 
       if (authorResponse === null) {
         setLoading(false)
         return
       }
 
-      setTweetInfo({...tweetInfo, author: authorResponse.data})
+      setTweetInfo({...tweetInfo, tweet: tweetObj, author: authorResponse.data})
       setLoading(false)
     }
 
     fetchFromAPI()
-  }, [])
+  }, [tweetObj])
 
-  const toggleLike = async () => {
+
+  const toggleLike = async (e) => {
+    e.preventDefault();
+    console.log('liking tweet niga')
     console.log(user)
     if (!user) {
       return
@@ -179,8 +204,9 @@ const Tweet = ({ tweetObj }) => {
     }
   }
 
-  const toggleRetweet = async () => {
-    console.log(user)
+  const toggleRetweet = async (e) => {
+    e.preventDefault();
+    
     if (!user) {
       return
     }
@@ -202,7 +228,8 @@ const Tweet = ({ tweetObj }) => {
     }
   }
 
-  const handleDeleteTweet = async () => {
+  const handleDeleteTweet = async (e) => {
+    e.preventDefault();
     console.log('deleting...')
     
     try {
@@ -221,10 +248,14 @@ const Tweet = ({ tweetObj }) => {
     return null
   }
 
+  console.log(tweetObj)
+  console.log(tweet)
+
   return (
     loading ? <div>Loading...</div> : (
       author ? (
         <MainContainer>
+          <StyledLink to={`/status/${tweet._id}`}></StyledLink>
           <StyledLink to={`/user/${author._id}`}><UserIcon src="/images/user_icon.jpg"/></StyledLink>
 
           <TweetInfo>
@@ -254,10 +285,25 @@ const Tweet = ({ tweetObj }) => {
                 
               </Dropdown>
             </TweetTopInfo>
-    
-            <TweetContent>
-              {tweet.text}
-            </TweetContent>
+            
+            <StyledLink to={`/${author._id}/status/${tweet._id}`}>
+              <TweetContent>
+                {tweet.text}
+              </TweetContent>
+            </StyledLink>
+            
+            {fromTweetPage ? (
+              <DetailedTweetInfo>
+                <TimePosted>
+                  {new Date().toString()}
+                </TimePosted>
+
+                <DetailedTweetActionsInfo>
+                  <DetailedTweetActionNum>47 Retweets</DetailedTweetActionNum>
+                  <DetailedTweetActionNum>1,311 likes</DetailedTweetActionNum>
+                </DetailedTweetActionsInfo>
+              </DetailedTweetInfo>
+            ) : null} 
               
             <TweetActions>
               <TweetAction>
@@ -292,10 +338,11 @@ const Tweet = ({ tweetObj }) => {
             </TweetActions>
           </TweetInfo>
         </MainContainer>
+        
       ) : null
       
     )
   );
 }
 
-export default Tweet;
+export default SmallTweet;

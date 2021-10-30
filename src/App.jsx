@@ -9,14 +9,15 @@ import './App.css';
 import styled from 'styled-components'
 import { useContext } from 'react'
 import { AuthContext } from './context/auth/AuthContext'
+import Authentication from './components/Authentication'
+import { AuthContextProvider } from './context/auth/AuthContext'
+import { TweetsContextProvider } from './context/tweets/TweetsContext'
 
 import LeftSidebar from './components/LeftSidebar'
 import RightSidebar from './components/RightSidebar'
 import Feed from './components/Feed'
 import UserProfile from "./components/UserProfile";
-import Authentication from './components/Authentication'
-import { AuthContextProvider } from './context/auth/AuthContext'
-import { TweetsContextProvider } from './context/tweets/TweetsContext'
+import TweetPage from "./components/TweetPage";
 
 const MainContainer = styled.div`
   display: flex;
@@ -44,6 +45,14 @@ const App = () => {
 
             <Route path="/login" exact>
               <Authentication type="login"/>
+            </Route>
+
+            <Route path="/:authorID/status/:tweetID" exact>
+              <MainContainer>
+                <LeftSidebar />
+                <TweetPage />
+                <RightSidebar />
+              </MainContainer>
             </Route>
 
             <Route path="/user/:id" exact>

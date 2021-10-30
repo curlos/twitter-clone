@@ -3,9 +3,11 @@ import TrendingTopic from './TrendingTopic'
 import RecommendedUsers from './RecommendedUsers'
 
 const MainContainer = styled.div`
-flex: 3;
+  flex: 3;
   background-color: #1C1E20;
   color: #fff;
+  padding-left: 15px;
+
 `
 
 const SearchBarContainer = styled.div`
