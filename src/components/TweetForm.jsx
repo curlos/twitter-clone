@@ -70,6 +70,8 @@ const TweetButton = styled.button`
   border: none;
   border-radius: 30px;
   padding: 12px;
+  padding-left: 17px;
+  padding-right: 17px;
   width: 100%;
   cursor: pointer;
 `
@@ -89,6 +91,8 @@ const TweetForm = () => {
       return
     }
 
+    console.log(user)
+
     try {
       const body = {
         userID: user._id,
@@ -98,9 +102,9 @@ const TweetForm = () => {
       console.log(body)
       
       const response = await axios.post('http://localhost:8888/api/tweets/tweet', body)
+      console.log('BOIS')
       tweetsDispatch({ type: "UPDATE_TWEETS", payload: [...tweets, response.data]})
-
-      console.log(response.data)
+      setText('')
     } catch(err) {
 
     }
