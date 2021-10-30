@@ -1,9 +1,11 @@
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import styled from 'styled-components'
 import SmallUser from './SmallUser'
+import TweetForm from './TweetForm'
 import { AuthContext } from '../context/auth/AuthContext'
+import TweetModal from './TweetModal'
 
 const MainContainer = styled.div`
   display: flex;
@@ -47,6 +49,7 @@ const TweetButton = styled.button`
   border-radius: 30px;
   padding: 15px;
   width: 100%;
+  cursor: pointer;
 `
 
 const StyledLink = styled(Link)`
@@ -54,11 +57,14 @@ const StyledLink = styled(Link)`
   text-decoration: none;
 `
 
+const Footer = styled.div`
+  width: 100%;
+`
+
 const LeftSidebar = () => {
 
   const { user } = useContext(AuthContext)
-
-  console.log(user)
+  const [showModal, setShowModal] = useState(false)
 
 
   return (
@@ -85,8 +91,20 @@ const LeftSidebar = () => {
             </StyledLink>
           )
         })}
+        
 
-        <TweetButton>Tweet</TweetButton>
+        <TweetButton onClick={() => setShowModal(true)}>Tweet</TweetButton>
+
+        {showModal ? (
+          <TweetModal showModal={showModal} setShowModal={setShowModal} children={
+            <span>
+              <TweetForm />
+
+              <Footer>&nbsp;</Footer>
+            </span>}
+          />
+          
+        ) : null}
       </div>
 
       <SmallUser user={user}/>
