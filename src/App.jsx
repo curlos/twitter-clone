@@ -18,10 +18,15 @@ import RightSidebar from './components/RightSidebar'
 import Feed from './components/Feed'
 import UserProfile from "./components/UserProfile";
 import TweetPage from "./components/TweetPage";
+import UserFollowsPage from "./components/UserFollowsPage";
 
 const MainContainer = styled.div`
   display: flex;
   margin: 0 45px;
+
+  a {
+    color: #fff;
+  }
 `
 
 const App = () => {
@@ -51,6 +56,22 @@ const App = () => {
               <MainContainer>
                 <LeftSidebar />
                 <TweetPage />
+                <RightSidebar />
+              </MainContainer>
+            </Route>
+
+            <Route path="/user/:id/following" exact>
+              <MainContainer>
+                <LeftSidebar />
+                <UserFollowsPage />
+                <RightSidebar />
+              </MainContainer>
+            </Route>
+
+            <Route path="/user/:id/followers" exact>
+              <MainContainer>
+                <LeftSidebar />
+                <UserFollowsPage />
                 <RightSidebar />
               </MainContainer>
             </Route>

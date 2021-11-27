@@ -5,6 +5,7 @@ import { TweetsContext } from '../context/tweets/TweetsContext'
 import axios from 'axios'
 import styled from 'styled-components'
 import * as timeago from 'timeago.js';
+import ReplyTweetModal from './ReplyTweetModal'
 
 const MainContainer = styled.div`
   display: flex;
@@ -138,12 +139,12 @@ const DetailedTweetActionsInfo = styled.span`
   padding: 10px 0px;
 `
 
-const DetailedTweetActionNum  = styled.span`
+const DetailedTweetActionNum = styled.span`
   margin-right: 10px;
 `
 
 
-const SmallTweet = ({ tweetObj, fromTweetPage }) => {
+const SmallTweet = ({ tweetObj, fromTweetPage, children }) => {
 
   const { user, userDispatch } = useContext(AuthContext)
   const { tweets, tweetsDispatch } = useContext(TweetsContext)
@@ -152,12 +153,19 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
   const { tweet, author } = tweetInfo
   const [loading, setLoading] = useState(true)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    
+
     if (tweet === null) {
-      return null
+      return
     }
+
+    if (tweetObj === null) {
+      return
+    }
+
+    console.log(user)
 
     const fetchFromAPI = async () => {
       // getting an error here because the userID from the tweet is empty
@@ -168,7 +176,7 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
         return
       }
 
-      setTweetInfo({...tweetInfo, tweet: tweetObj, author: authorResponse.data})
+      setTweetInfo({ ...tweetInfo, tweet: tweetObj, author: authorResponse.data })
       setLoading(false)
     }
 
@@ -195,8 +203,8 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
       console.log(user)
       const response = await axios.put(`http://localhost:8888/api/tweets/tweet/like/${tweet._id}`, body)
       console.log(response.data)
-      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
-      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      setTweetInfo({ ...tweetInfo, tweet: response.data.updatedTweet })
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser })
       console.log('updatedUser')
       console.log(user)
     } catch (err) {
@@ -206,7 +214,7 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
 
   const toggleRetweet = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
       return
     }
@@ -219,8 +227,8 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
 
       const response = await axios.put(`http://localhost:8888/api/tweets/tweet/retweet/${tweet._id}`, body)
       console.log(response.data)
-      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
-      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      setTweetInfo({ ...tweetInfo, tweet: response.data.updatedTweet })
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser })
       console.log('updatedUser')
       console.log(user)
     } catch (err) {
@@ -231,12 +239,12 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
   const handleDeleteTweet = async (e) => {
     e.preventDefault();
     console.log('deleting...')
-    
+
     try {
       const response = await axios.delete(`http://localhost:8888/api/tweets/tweet/${tweet._id}`)
       const filteredTweets = tweets.filter((tweetObj) => tweetObj._id !== tweet._id)
 
-      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets})
+      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets })
 
       console.log(response)
     } catch (err) {
@@ -248,15 +256,14 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
     return null
   }
 
-  console.log(tweetObj)
-  console.log(tweet)
+  console.log(showModal)
 
   return (
     loading ? <div>Loading...</div> : (
       author ? (
         <MainContainer>
           <StyledLink to={`/status/${tweet._id}`}></StyledLink>
-          <StyledLink to={`/user/${author._id}`}><UserIcon src="/images/user_icon.jpg"/></StyledLink>
+          <StyledLink to={`/user/${author._id}`}><UserIcon src="/images/user_icon.jpg" /></StyledLink>
 
           <TweetInfo>
             <TweetTopInfo>
@@ -282,65 +289,59 @@ const SmallTweet = ({ tweetObj, fromTweetPage }) => {
                     ) : null}
                   </DropdownListElem>
                 </DropdownContent>
-                
+
               </Dropdown>
             </TweetTopInfo>
-            
+
             <StyledLink to={`/${author._id}/status/${tweet._id}`}>
               <TweetContent>
                 {tweet.text}
               </TweetContent>
             </StyledLink>
-            
-            {fromTweetPage ? (
-              <DetailedTweetInfo>
-                <TimePosted>
-                  {new Date().toString()}
-                </TimePosted>
 
-                <DetailedTweetActionsInfo>
-                  <DetailedTweetActionNum>47 Retweets</DetailedTweetActionNum>
-                  <DetailedTweetActionNum>1,311 likes</DetailedTweetActionNum>
-                </DetailedTweetActionsInfo>
-              </DetailedTweetInfo>
-            ) : null} 
-              
             <TweetActions>
               <TweetAction>
-                <i class="far fa-comment"></i>
+                <i class="far fa-comment" onClick={(e) => {
+                  e.preventDefault()
+                  console.log('click')
+                  setShowModal(!showModal)
+                }}></i>
                 <span>{tweet.replies.length}</span>
               </TweetAction>
 
               <TweetAction>
-                {user && user.retweets.includes(tweet._id) ? (
+                {user && user.retweets && user.retweets.includes(tweet._id) ? (
                   <Retweeted>
                     <i class="fas fa-retweet" onClick={toggleRetweet}></i>
                   </Retweeted>
-                ): <i class="fas fa-retweet" onClick={toggleRetweet}></i>}
-                
+                ) : <i class="fas fa-retweet" onClick={toggleRetweet}></i>}
+
                 <span>{tweet.retweets.length}</span>
               </TweetAction>
-    
+
               <TweetAction>
-                {user && user.likes.includes(tweet._id) ? (
+                {user && user.likes && user.likes.includes(tweet._id) ? (
                   <Liked>
                     <i class="fas fa-heart" onClick={toggleLike}></i>
                   </Liked>
-                ): <i class="far fa-heart" onClick={toggleLike}></i>}
-                
+                ) : <i class="far fa-heart" onClick={toggleLike}></i>}
+
                 <span>{tweet.likes.length}</span>
               </TweetAction>
-    
+
               <TweetAction>
                 <i class="fas fa-share-square"></i>
               </TweetAction>
-              
+
             </TweetActions>
           </TweetInfo>
+
+          {showModal ? <ReplyTweetModal parentTweetInfo={tweetInfo} setTweetInfo={setTweetInfo} showModal={showModal} setShowModal={setShowModal} children={children} /> : null}
+
         </MainContainer>
-        
+
       ) : null
-      
+
     )
   );
 }

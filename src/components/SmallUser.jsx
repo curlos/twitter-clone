@@ -1,5 +1,8 @@
+import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import axios from 'axios'
+import { AuthContext } from '../context/auth/AuthContext'
 
 const UserContainer = styled.div`
   display: flex;
@@ -42,10 +45,12 @@ const FollowButton = styled.button`
   border: none;
   border-radius: 30px;
   padding: 10px 20px;
+  cursor: pointer;
 `
 
 const UnfollowButton = styled(FollowButton)`
   background-color: #434649;
+  cursor: pointer;
 `
 
 const StyledLink = styled(Link)`
@@ -55,6 +60,34 @@ const StyledLink = styled(Link)`
 `
 
 const SmallUser = ({ buttonType, user }) => {
+
+  const { user: loggedInUserObj, userDispatch } = useContext(AuthContext)
+  const [loggedInUser, setLoggedInUser] = useState(loggedInUserObj)
+
+  const handleFollowUser = async () => {
+    console.log(loggedInUser._id)
+    console.log(user._id)
+    if (user === null) {
+      return
+    }
+
+    if (!user._id || (user._id && user._id === loggedInUser._id)) {
+      return
+    }
+
+    const body = {
+      childUserID: user._id
+    }
+
+    const response = await axios.put(`http://localhost:8888/api/users/user/follow/${loggedInUser._id}`, body)
+    console.log(response.data)
+
+    setLoggedInUser(response.data.updatedParentUser)
+    userDispatch({ type: "UPDATE_USER", payload: response.data.updatedChildUser})
+  }
+
+  console.log(loggedInUser)
+  console.log(user)
 
   return (
     <UserContainer>
@@ -71,7 +104,10 @@ const SmallUser = ({ buttonType, user }) => {
       </UserInfo>
 
       <div>
-        {buttonType === 'follow' ? <FollowButton>Follow</FollowButton> : <i class="fas fa-ellipsis-h"></i>}
+      {user && loggedInUser._id !== user._id ? (
+              loggedInUser.following.includes(user._id) ? (
+                <UnfollowButton onClick={handleFollowUser}>Unfollow</UnfollowButton>
+              ) : <FollowButton onClick={handleFollowUser}>Follow</FollowButton>) : null }
       </div>
     </UserContainer>
   )

@@ -88,7 +88,7 @@ const CharLimitCounter = styled.div`
 `
 
 
-const TweetForm = ({ replying }) => {
+const TweetForm = ({ parentTweetInfo, setTweetInfo }) => {
   
   const { user, userDispatch } = useContext(AuthContext)
   const { tweets, tweetsDispatch } = useContext(TweetsContext)
@@ -146,10 +146,10 @@ const TweetForm = ({ replying }) => {
 
       console.log(body)
       
-      const response = await axios.post('http://localhost:8888/api/tweets/tweet', body)
+      const response = await axios.post(`http://localhost:8888/api/tweets/tweet/reply/${parentTweetInfo.tweet._id}`, body)
       console.log('BOIS')
-      tweetsDispatch({ type: "UPDATE_TWEETS", payload: [...tweets, response.data]})
       setText('')
+      setTweetInfo({...parentTweetInfo, replies: [response.data.newTweet, ...parentTweetInfo.replies]})
     } catch(err) {
 
     }
@@ -174,7 +174,7 @@ const TweetForm = ({ replying }) => {
 
           <TweetButtonAndCharLimit>
             <CharLimitCounter charLimitReached={text.length === MAX_CHAR_LIMIT}>{text.length} / {MAX_CHAR_LIMIT}</CharLimitCounter>
-            {!replying ? (
+            {!parentTweetInfo ? (
               <TweetButton onClick={handlePostTweet}>Tweet</TweetButton>
             ) : <TweetButton onClick={handleReplyTweet}>Reply</TweetButton>}
           </TweetButtonAndCharLimit>

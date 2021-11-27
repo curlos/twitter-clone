@@ -335,8 +335,14 @@ const UserProfile = () => {
           </div>
 
           <FollowContainer>
-            <FollowingNum><strong>{profileUserInfo.user.following.length}</strong> following</FollowingNum>
-            <span><strong>{profileUserInfo.user.followers.length}</strong> {profileUserInfo.user.followers.length === 1 ? 'Follower' : 'Followers'}</span>
+            <StyledLink to={`/user/${profileUserInfo.user._id}/following`}>
+              <FollowingNum><strong>{profileUserInfo.user.following.length}</strong> following</FollowingNum>
+            </StyledLink>
+
+            <StyledLink to={`/user/${profileUserInfo.user._id}/followers`}>
+              <span><strong>{profileUserInfo.user.followers.length}</strong> {profileUserInfo.user.followers.length === 1 ? 'Follower' : 'Followers'}</span>
+            </StyledLink>
+            
           </FollowContainer>
 
           <FollowedBy>

@@ -52,7 +52,22 @@ const Tweets = ({ tweetsToShow }) => {
   console.log(tweets)
 
   const sortTweetsByNewest = (tweetsToFilter) => {
-    return tweetsToFilter.sort((tweetOne, tweetTwo) => (tweetOne.createdAt > tweetTwo.createdAt ? -1 : 1))
+    console.log(tweetsToFilter)
+    return tweetsToFilter.sort((tweetOne, tweetTwo) => {
+      if (tweetOne === null && tweetTwo === null) {
+        return 0
+      }
+
+      if (tweetOne === null) {
+        return 1
+      }
+
+      if (tweetTwo === null) {
+        return -1
+      }
+
+      return tweetOne.createdAt > tweetTwo.createdAt ? -1 : 1
+    })
   }
 
   const sortTweetsByOldest = (tweetsToFilter) => {

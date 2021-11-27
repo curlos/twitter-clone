@@ -7,11 +7,13 @@ import styled from 'styled-components'
 import moment from 'moment'
 import SmallTweet from './SmallTweet'
 import TweetForm from './TweetForm'
+import ReplyForm from './ReplyForm'
 
 
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
+  flex-basis: 0;
   background-color: #232627;
   padding: 10px;
   width: 100%;
@@ -59,6 +61,8 @@ const Verified = styled.span`
 `
 
 const TweetContent = styled.div`
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   font-size: 22px;
   margin-top: 15px;
   white-space: pre;
@@ -146,7 +150,7 @@ const DetailedTweetActionsInfo = styled.div`
   border-bottom: 2px solid #54595a;
 `
 
-const DetailedTweetActionNum  = styled.span`
+const DetailedTweetActionNum = styled.span`
   margin-right: 10px;
 `
 
@@ -164,20 +168,24 @@ const TweetReplyContainer = styled.div`
   border-bottom: 2px solid #54595a;
 `
 
+const ReplyContainer = styled.div`
+  padding: 15px;
+`
+
 const FullTweet = ({ tweetObj, fromTweetPage }) => {
 
   const { user, userDispatch } = useContext(AuthContext)
   const { tweets, tweetsDispatch } = useContext(TweetsContext)
 
-  const [tweetInfo, setTweetInfo] = useState({ tweet: {}, author: {} })
-  const { tweet, author } = tweetInfo
-  const [replies, setReplies] = useState([])
+  const [tweetInfo, setTweetInfo] = useState({ tweet: {}, author: {}, replies: [] })
+  const { tweet, author, replies } = tweetInfo
   const [loading, setLoading] = useState(true)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    
+
     if (tweet === null) {
       return null
     }
@@ -191,12 +199,23 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
         return
       }
 
-      setTweetInfo({...tweetInfo, tweet: tweetObj, author: authorResponse.data})
+      const newReplies = await getAllReplies(tweetObj)
+
+      setTweetInfo({ ...tweetInfo, tweet: tweetObj, author: authorResponse.data, replies: newReplies })
       setLoading(false)
     }
 
     fetchFromAPI()
   }, [tweetObj])
+
+  const getAllReplies = async (currTweet) => {
+    const allReplies = []
+    for (let tweetID of currTweet.replies) {
+      const response = await axios.get(`http://localhost:8888/api/tweets/tweet/${tweetID}`)
+      allReplies.push(response.data)
+    }
+    return allReplies
+  }
 
 
   const toggleLike = async (e) => {
@@ -218,8 +237,8 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
       console.log(user)
       const response = await axios.put(`http://localhost:8888/api/tweets/tweet/like/${tweet._id}`, body)
       console.log(response.data)
-      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
-      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      setTweetInfo({ ...tweetInfo, tweet: response.data.updatedTweet })
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser })
       console.log('updatedUser')
       console.log(user)
     } catch (err) {
@@ -229,7 +248,7 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
 
   const toggleRetweet = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
       return
     }
@@ -242,8 +261,8 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
 
       const response = await axios.put(`http://localhost:8888/api/tweets/tweet/retweet/${tweet._id}`, body)
       console.log(response.data)
-      setTweetInfo({...tweetInfo, tweet: response.data.updatedTweet})
-      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser})
+      setTweetInfo({ ...tweetInfo, tweet: response.data.updatedTweet })
+      userDispatch({ type: "UPDATE_USER", payload: response.data.updatedUser })
       console.log('updatedUser')
       console.log(user)
     } catch (err) {
@@ -254,12 +273,12 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
   const handleDeleteTweet = async (e) => {
     e.preventDefault();
     console.log('deleting...')
-    
+
     try {
       const response = await axios.delete(`http://localhost:8888/api/tweets/tweet/${tweet._id}`)
       const filteredTweets = tweets.filter((tweetObj) => tweetObj._id !== tweet._id)
 
-      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets})
+      tweetsDispatch({ type: "UPDATE_TWEETS", payload: filteredTweets })
 
       console.log(response)
     } catch (err) {
@@ -271,20 +290,17 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
     return null
   }
 
-  console.log(tweetObj)
-  console.log(tweet)
-
   return (
     loading ? <div>Loading...</div> : (
       author ? (
         <MainContainer>
           <StyledLink to={`/status/${tweet._id}`}></StyledLink>
-          
+
 
           <TweetInfo>
             <TweetTopInfo>
               <TweetAuthorInfo>
-                <StyledLink to={`/user/${author._id}`}><UserIcon src="/images/user_icon.jpg"/></StyledLink>
+                <StyledLink to={`/user/${author._id}`}><UserIcon src="/images/user_icon.jpg" /></StyledLink>
                 <div>
                   <StyledLink to={`/user/${author._id}`}>
                     <AuthorFullName>{author.fullName}</AuthorFullName>
@@ -306,18 +322,18 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
                     ) : null}
                   </DropdownListElem>
                 </DropdownContent>
-                
+
               </Dropdown>
             </TweetTopInfo>
 
             <TweetContent>
               {tweet.text}
             </TweetContent>
-            
+
             <StyledLink to={`/${author._id}/status/${tweet._id}`}>
-              
+
             </StyledLink>
-            
+
             <DetailedTweetInfo>
               <TimePosted>
                 {moment(tweet.createdAt).format('h:mm A • MMMM Do YYYY')}
@@ -325,7 +341,7 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
 
               <DetailedTweetActionsInfo>
                 <DetailedTweetActionNum>
-                  <strong>{tweet.retweets.length}</strong> 
+                  <strong>{tweet.retweets.length}</strong>
                   <TweetActionsDesc>{tweet.retweets.length === 1 ? 'Retweet' : 'Retweets'}</TweetActionsDesc>
                 </DetailedTweetActionNum>
                 <DetailedTweetActionNum>
@@ -334,44 +350,46 @@ const FullTweet = ({ tweetObj, fromTweetPage }) => {
                 </DetailedTweetActionNum>
               </DetailedTweetActionsInfo>
             </DetailedTweetInfo>
-              
+
             <TweetActions>
               <TweetAction>
                 <i class="far fa-comment"></i>
               </TweetAction>
 
               <TweetAction>
-                {user && user.retweets.includes(tweet._id) ? (
+                {user && user.retweets && user.retweets.includes(tweet._id) ? (
                   <Retweeted>
                     <i class="fas fa-retweet" onClick={toggleRetweet}></i>
                   </Retweeted>
-                ): <i class="fas fa-retweet" onClick={toggleRetweet}></i>}
+                ) : <i class="fas fa-retweet" onClick={toggleRetweet}></i>}
               </TweetAction>
-    
+
               <TweetAction>
-                {user && user.likes.includes(tweet._id) ? (
+                {user && user.likes && user.likes.includes(tweet._id) ? (
                   <Liked>
                     <i class="fas fa-heart" onClick={toggleLike}></i>
                   </Liked>
-                ): <i class="far fa-heart" onClick={toggleLike}></i>}
+                ) : <i class="far fa-heart" onClick={toggleLike}></i>}
               </TweetAction>
-    
+
               <TweetAction>
                 <i class="fas fa-share-square"></i>
               </TweetAction>
-              
+
             </TweetActions>
           </TweetInfo>
 
           <TweetReplyContainer>
-            <TweetForm replying={true}/>
+            <TweetForm parentTweetInfo={tweetInfo} setTweetInfo={setTweetInfo} />
           </TweetReplyContainer>
 
-          <SmallTweet tweetObj={tweet} />
+          {replies.map((newTweet) => newTweet !== null ? <SmallTweet tweetObj={newTweet} showModal={showModal} setShowModal={setShowModal} children={<ReplyForm parentTweetInfo={tweetInfo} setTweetInfo={setTweetInfo} />} /> : null)}
+
+
         </MainContainer>
-        
+
       ) : null
-      
+
     )
   );
 }
